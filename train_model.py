@@ -5,7 +5,7 @@ from torch import nn
 from torch.utils.data import DataLoader
 from torch.utils.data import Dataset
 from sklearn.metrics import classification_report, cohen_kappa_score
-from sample_features import Sampling
+from sampling import Sampling
 from plots import Plots
 
 BATCH_SIZE = 4096
