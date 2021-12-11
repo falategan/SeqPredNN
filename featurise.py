@@ -23,11 +23,16 @@ def get_args():
     arg_parser.add_argument('pdb_dir', type=str, help="directory of pdb files. Subdirectories and gzipped pdb files "
                                                       "must be named according to the PDB archive convention "
                                                       "e.g. pdb_dir/xy/pdb1xyz.ent.gz")
+    arg_parser.add_argument('pdb_layout', type=str, choices=['all', 'divided'],
+                            help="pdb directory structure. 'divided' requires gzipped pdb files in subdirectories named"
+                                 " according to the PDB archive divided convention e.g. pdb_dir/xy/pdb1xyz.ent.gz for "
+                                 "protein 1XYZ. 'all' requires all gzipped pdb files in a single directory e.g."
+                                 " pdb_dir/pdb1xyz.ent.gz")
     arg_parser.add_argument('-o', '--out_dir', type=str, default='./features',
                             help="output directory. Will create a new directory if OUT_DIR does not exist.")
     arg_parser.add_argument('-v', '--verbose', action='store_true')
     args = arg_parser.parse_args()
-    return args.chain_list, pathlib.Path(args.out_dir), pathlib.Path(args.pdb_dir), args.verbose
+    return args.chain_list, pathlib.Path(args.out_dir), pathlib.Path(args.pdb_dir), args.verbose, args.pdb_layout
 
 
 def read_chain_file(path):
@@ -65,7 +70,10 @@ def featurise_protein(protein_id, selected_chains):
     if selected_chains:
         # fetch pdb file
         file_name = 'pdb' + protein_id.lower() + '.ent.gz'
-        protein_path = pdb_dir / protein_id.lower()[1:3] / file_name
+        if pdb_layout == 'divided':
+            protein_path = pdb_dir / protein_id.lower()[1:3] / file_name
+        elif pdb_layout == 'all':
+            protein_path = pdb_dir / file_name
         if protein_path.exists():
             # unzip pdb file
             with gzip.open(protein_path, 'rt') as gz_file:
@@ -316,7 +324,7 @@ class Chain:
 
 if __name__ == "__main__":
     # get arguments
-    chain_file, out_dir, pdb_dir, verbose = get_args()
+    chain_file, out_dir, pdb_dir, verbose, pdb_layout = get_args()
 
     # create output directory
     if not out_dir.exists():
