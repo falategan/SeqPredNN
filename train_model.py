@@ -119,6 +119,7 @@ if __name__ == "__main__":
     # set model
     feature_size = training_data.examples.shape[1]
     model = NeuralNetwork(feature_size).to(device)
+    print('Model layout:\n' + str(model.linear_relu_stack), '\n')
 
     # setup optimiser
     loss_fn = nn.CrossEntropyLoss()
@@ -149,15 +150,16 @@ if __name__ == "__main__":
         classes = ('GLY', 'ALA', 'CYS', 'PRO', 'VAL', 'ILE', 'LEU', 'MET', 'PHE', 'TRP', 'SER', 'THR', 'ASN', 'GLN',
                    'TYR', 'ASP', 'GLU', 'HIS', 'LYS', 'ARG')
         # get per residue precision, recall and f1-scores
-        report = classification_report(true, pred, target_names=classes)
+        report = classification_report(true, pred, target_names=classes, zero_division=0)
         print('Classification report:\n')
         print(report)
+        print('Note: precision and F-scores are set to 0.0 for classes that have no predictions')
         kappa = cohen_kappa_score(true, pred)
         print('Cohen kappa score:', kappa, '\n')
         with open(out_dir / 'report.txt', 'w') as file:
             file.write(report)
             file.write('Cohen kappa score: ' + str(kappa))
-
+            file.write('Note: precision and F-scores are set to 0.0 for classes that have no predictions')
         print('Generating graphs...\n')
         plot = Plots(out_dir)
         plot.learning_curve(epochs, accuracies, train_loss_list, validation_loss_list)

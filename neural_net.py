@@ -36,7 +36,6 @@ class NeuralNetwork(nn.Module):
             nn.Dropout(p=0.5),
             nn.Linear(64, 20)
         )
-        print('Model layout:\n', self.linear_relu_stack, '\n')
 
     def forward(self, x):
         x = self.flatten(x)
