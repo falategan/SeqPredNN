@@ -3,10 +3,10 @@ import pathlib
 import argparse
 from torch import nn
 from torch.utils.data import DataLoader
-from torch.utils.data import Dataset
 from sklearn.metrics import classification_report, cohen_kappa_score
 from sampling import Sampling
 from plots import Plots
+from neural_net import StructureDataset, NeuralNetwork
 
 BATCH_SIZE = 4096
 
@@ -34,47 +34,6 @@ def get_args():
         raise ValueError('The train ratio must be a number between 0 and 1')
     return pathlib.Path(args.input_dir), args.sampling_mode, args.train_ratio, args.test_set, \
            pathlib.Path(args.out_dir), args.epochs
-
-
-class StructureDataset(Dataset):
-    def __init__(self, features):
-        self.labels = features['residue_labels'].long()
-        self.example_features = [torch.flatten(features[key], start_dim=1) for key in ['displacements', 'rotations',
-                                                                                       'torsional_angles']]
-        self.examples = torch.cat(self.example_features, dim=1)
-
-    def __len__(self):
-        return len(self.labels)
-
-    def __getitem__(self, idx):
-        return self.examples[idx], self.labels[idx]
-
-
-class NeuralNetwork(nn.Module):
-    def __init__(self, input_nodes):
-        super(NeuralNetwork, self).__init__()
-        self.flatten = nn.Flatten()
-        self.linear_relu_stack = nn.Sequential(
-            nn.Linear(input_nodes, 64),
-            nn.ReLU(),
-            nn.Dropout(p=0.5),
-            nn.Linear(64, 64),
-            nn.ReLU(),
-            nn.Dropout(p=0.5),
-            nn.Linear(64, 64),
-            nn.ReLU(),
-            nn.Dropout(p=0.5),
-            nn.Linear(64, 64),
-            nn.ReLU(),
-            nn.Dropout(p=0.5),
-            nn.Linear(64, 20)
-        )
-        print('Model layout:\n', self.linear_relu_stack, '\n')
-
-    def forward(self, x):
-        x = self.flatten(x)
-        output_values = self.linear_relu_stack(x)
-        return output_values
 
 
 def train(dataloader, model, loss_fn, optimizer):
@@ -160,6 +119,7 @@ if __name__ == "__main__":
     # set model
     feature_size = training_data.examples.shape[1]
     model = NeuralNetwork(feature_size).to(device)
+    print('Model layout:\n' + str(model.linear_relu_stack), '\n')
 
     # setup optimiser
     loss_fn = nn.CrossEntropyLoss()
@@ -190,15 +150,16 @@ if __name__ == "__main__":
         classes = ('GLY', 'ALA', 'CYS', 'PRO', 'VAL', 'ILE', 'LEU', 'MET', 'PHE', 'TRP', 'SER', 'THR', 'ASN', 'GLN',
                    'TYR', 'ASP', 'GLU', 'HIS', 'LYS', 'ARG')
         # get per residue precision, recall and f1-scores
-        report = classification_report(true, pred, target_names=classes)
+        report = classification_report(true, pred, target_names=classes, zero_division=0)
         print('Classification report:\n')
         print(report)
+        print('Note: precision and F-scores are set to 0.0 for classes that have no predictions')
         kappa = cohen_kappa_score(true, pred)
         print('Cohen kappa score:', kappa, '\n')
         with open(out_dir / 'report.txt', 'w') as file:
             file.write(report)
             file.write('Cohen kappa score: ' + str(kappa))
-
+            file.write('Note: precision and F-scores are set to 0.0 for classes that have no predictions')
         print('Generating graphs...\n')
         plot = Plots(out_dir)
         plot.learning_curve(epochs, accuracies, train_loss_list, validation_loss_list)
