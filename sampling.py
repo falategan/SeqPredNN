@@ -22,8 +22,9 @@ class Sampling:
         if test_list_path is not None:
             print('Reading test list...\n')
             with open(test_list_path, 'r') as file:
-                file.__next__()
-                self.test_chain_codes = [line[:9].strip('\n').strip(' ') for line in file]
+                self.test_chain_codes = [line.split(' ')[0].strip('\n') for line in file]
+                if self.test_chain_codes[0] == 'PDBchain':
+                    self.test_chain_codes = self.test_chain_codes[1:]
 
         # generate a unique index for each residue in the processed chains
         print('Reading chain list...\n')

@@ -37,8 +37,9 @@ def get_args():
 
 def read_chain_file(path):
     with open(path, 'r') as file:
-        file.__next__()
-        codes = [line[:9].strip('\n').strip(' ') for line in file]
+        codes = [line.split(' ')[0].strip('\n') for line in file]
+        if codes[0] == 'PDBchain':
+            codes = codes[1:]
     return codes
 
 
