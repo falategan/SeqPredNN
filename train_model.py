@@ -146,7 +146,7 @@ if __name__ == "__main__":
     if list(validation_features['residue_labels']):
         print('Final model validation\n-------------------------------')
         # get list of predicted and true residues for the entire validation set
-        pred, true = validate_final(validation_dataloader, model)
+        true, pred = validate_final(validation_dataloader, model)
         classes = ('GLY', 'ALA', 'CYS', 'PRO', 'VAL', 'ILE', 'LEU', 'MET', 'PHE', 'TRP', 'SER', 'THR', 'ASN', 'GLN',
                    'TYR', 'ASP', 'GLU', 'HIS', 'LYS', 'ARG')
         # get per residue precision, recall and f1-scores
