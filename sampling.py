@@ -6,13 +6,6 @@ from collections import defaultdict
 # import matplotlib.pyplot as plt
 
 
-def undersample(indices, sample_size):
-    # draw random sample of indices from each amino acid class for the training set
-    sample_idx = np.concatenate([np.random.choice(indices[key], sample_size, replace=False) for key in indices])
-    remaining_idx = {key: list(set(indices[key]) - set(sample_idx)) for key in indices}
-    return sample_idx, remaining_idx
-
-
 class Sampling:
     def __init__(self, input_dir, test_list_path, train_ratio):
         self.train_ratio = train_ratio
@@ -43,6 +36,17 @@ class Sampling:
         print('Compiling index list...\n')
         self.idx_dict = {idx: chain for chain in self.chains for idx in
                          range(self.chains[chain][0], self.chains[chain][0] + self.chains[chain][1])}
+
+    @staticmethod
+    def undersample(indices, sample_size):
+        # draw random sample of indices from each amino acid class for the training set
+        remaining_idx = {float(i): [] for i in range(20)}
+        sample_idx = []
+        for amino_acid in indices:
+            sample_idx.append(np.random.choice(indices[amino_acid], sample_size, replace=False))
+            remaining_idx[amino_acid] = [idx for idx in indices[amino_acid] if not np.isin(idx, sample_idx[-1])]
+        sample_idx = np.concatenate(sample_idx)
+        return sample_idx, remaining_idx
 
     def get_sample_chains(self, indices):
         # store chain code for each sampled residue as {chain_code: residue_index} key-value pairs
@@ -99,8 +103,11 @@ class Sampling:
                        'SER', 'THR', 'ASN', 'GLN', 'TYR', 'ASP', 'GLU', 'HIS', 'LYS', 'ARG']
 
         # get residue labels for each chain
+        print([(chain, self.chains[chain], torch.load(self.input_dir / ('residue_labels_' + chain + '.pt')).shape)
+                                       for chain in self.chains])
         all_residues = np.concatenate([torch.load(self.input_dir / ('residue_labels_' + chain + '.pt'))
                                        for chain in self.chains], axis=0)
+        print(all_residues.shape)
         residue_idx = {float(i): [] for i in range(20)}
         # store indices for each amino acid class as {residue_class: [indices]} key-value pairs
         for idx, residue in enumerate(all_residues):
@@ -116,10 +123,10 @@ class Sampling:
         print('\nDrawing', aa_sample_size, 'residues for each amino acid class\n')
         # draw random sample of indices from each amino acid class for the training set
         train_size = int(aa_sample_size * self.train_ratio)
-        train_idx, remaining_idx = undersample(residue_idx, train_size)
+        train_idx, remaining_idx = self.undersample(residue_idx, train_size)
         print('Training set:', train_size, 'residues per amino acid class')
         validation_size = aa_sample_size - train_size
-        validation_idx, _ = undersample(remaining_idx, validation_size)
+        validation_idx, _ = self.undersample(remaining_idx, validation_size)
         print('Validation set:', validation_size, 'residues per amino acid class\n')
 
         # get features for sampled residues
