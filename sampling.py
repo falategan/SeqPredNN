@@ -126,7 +126,7 @@ class Sampling:
         train_idx, remaining_idx = self.undersample(residue_idx, train_size)
         print('Training set:', train_size, 'residues per amino acid class')
         validation_size = aa_sample_size - train_size
-        validation_idx, unsampled = self.undersample(remaining_idx, validation_size)
+        validation_idx, _ = self.undersample(remaining_idx, validation_size)
         print('Validation set:', validation_size, 'residues per amino acid class\n')
 
         # get features for sampled residues
