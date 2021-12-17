@@ -49,14 +49,14 @@ Deep feed-forward neural network for predicting amino acid sequences from protei
        prediction.py - o predictions feature_directory test_chains.txt my_model/model_parameters.pth
           
   * Evaluation output:
-    * classification report with precision, recall and f1-score for each amino acid class
-    * top K accuracy of the predictions for each amino acid class
+    * A classification report with precision, recall and f1-score for each amino acid class
+    * The top K accuracy of the predictions for each amino acid class
     * 3 confusion matrices (unnormalised, normalised by prediciton and normalised by true residue
     * For each chain in the test set:
-      * the predicted sequence
-      * the probabilities for each amino acid class produced by the model for each preducted residue
-      * a classification report
-      * cross-entropy loss for each predicted residue
+      * The predicted sequence
+      * The probabilities for each amino acid class produced by the model for each preducted residue
+      * A classification report
+      * Cross-entropy loss for each predicted residue
 
 ## Pretrained model 
 
