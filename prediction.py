@@ -178,6 +178,9 @@ class Evaluator:
                                   range(1, 21)}
             # draw curve of model accuracy for the top-K predictions of each residue
             model_plot.top_k_curve(top_k_accuracy)
+            with open(self.out_dir / 'top_K.txt', 'w') as file:
+                for k in top_k_accuracy:
+                    file.write(str(k) + ': ' + str(top_k_accuracy[k]) + '\n')
         else:
             print("Could not plot confusion matrices or top-K accuracy curve because some residues do not have any "
                   "labels in the test set")
@@ -196,6 +199,8 @@ class Evaluator:
 def read_test_list(test_list):
     with open(test_list, 'r') as file:
         test_chains = [line.split(' ')[0].strip('\n') for line in file]
+        if test_chains[0] == 'PDBchain':
+            test_chains = test_chains[1:]
     return test_chains
 
 
