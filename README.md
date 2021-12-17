@@ -27,7 +27,7 @@ Deep feed-forward neural network for predicting amino acid sequences from protei
 
 2. Predict sequence using `prediction.py`
 
-                prediction.py -p example_features examples/chain_list.txt pretrained_model/pretrained_parameters.pth
+       prediction.py -p example_features examples/chain_list.txt pretrained_model/pretrained_parameters.pth
  
     - prediction-only mode (-p) does not evaluate the model by comparing predictions with the original sequence 
  
@@ -38,7 +38,7 @@ Deep feed-forward neural network for predicting amino acid sequences from protei
     - see **Predicting protein sequences using the pretrained model** for more details
 3. Train the model using `train_model.py`
 
-                train_model.py -r 0.9 -t test_chains.txt -o my_model -e 200 feature_directory balanced
+       train_model.py -r 0.9 -t test_chains.txt -o my_model -e 200 feature_directory balanced
 
     - The train ratio (-r) is the fraction of residues assigned to the training dataset. The remaining residues are assigned to a validation set used to evaluate the model during training
     - the test chain file (-t) specifies which chains should be excluded from the training and validation datasets so that they can be used for independent evaluation of the model. The test chain file must be in the same format as examples/chain_list.txt.
@@ -46,7 +46,7 @@ Deep feed-forward neural network for predicting amino acid sequences from protei
     - the balanced/unbalanced keyword specifies the sampling mode. "unbalanced" sampling partitions all the residues in the features into the training and validation datasets. "balanced" sampling undersamples the residues so that each of the 20 amino acid classes occur the same number of times in the dataset.
 4. Test your model using `prediction.py`
                 
-                prediction.py - o predictions feature_directory test_chains.txt my_model/model_parameters.pth
+       prediction.py - o predictions feature_directory test_chains.txt my_model/model_parameters.pth
           
     - Evaluation output:
         - classification report with precision, recall and f1-score for each amino acid class
