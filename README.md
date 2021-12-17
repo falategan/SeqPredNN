@@ -27,7 +27,7 @@ Deep feed-forward neural network for predicting amino acid sequences from protei
 
 2. Predict sequence using `prediction.py`
 
-                prediction.py -p example_features examples/chain_list.txt pretrained_parameters.pth
+                prediction.py -p example_features examples/chain_list.txt pretrained_model/pretrained_parameters.pth
  
     - prediction-only mode (-p) does not evaluate the model by comparing predictions with the original sequence 
  
