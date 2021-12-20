@@ -176,8 +176,6 @@ class Evaluator:
                 warnings.simplefilter("ignore")
                 top_k_accuracy = {k: metrics.top_k_accuracy_score(self.model_true, self.model_softmax, k=k) for k in
                                   range(1, 21)}
-            # draw curve of model accuracy for the top-K predictions of each residue
-            model_plot.top_k_curve(top_k_accuracy)
             with open(self.out_dir / 'top_K.txt', 'w') as file:
                 for k in top_k_accuracy:
                     file.write(str(k) + ': ' + str(top_k_accuracy[k]) + '\n')
