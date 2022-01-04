@@ -229,7 +229,8 @@ def main():
                 # convert true and predicted residue lists to strings, with X for non-standard residues
                 pred_seq, true_seq = predict.complete_seq(pred_residues, true_residues, chain, feat_dir)
                 print(chain, '- Predicted sequence:\n' + pred_seq)
-                print(chain, '- Original sequence:\n' + true_seq + '\n')
+                if not pred_only:
+                    print(chain, '- Original sequence:\n' + true_seq + '\n')
 
                 chain_dir = out_dir / chain
                 if not chain_dir.exists():
