@@ -18,7 +18,7 @@ Deep feed-forward neural network for predicting amino acid sequences from protei
 
 1.  Featurise your protein strucutures using `featurise.py`
 
-        featurise.py -v -o example_features examples/chain_list.txt examples/pdb_divided divided 
+        featurise.py -v -o feature_directory examples/chain_list.txt examples/pdb_divided divided 
 
     - examples of a chain list and PDB directory are given in examples/
     - examples/chain_list.txt is a text file specifying the protein chains that must be featurised. It contains a newline-seperated list of protein chain IDs in the format 1XYZA for chain A of protein 1XYZ
@@ -27,7 +27,7 @@ Deep feed-forward neural network for predicting amino acid sequences from protei
 
 2. Predict sequence using `prediction.py`
 
-       prediction.py -p example_features examples/chain_list.txt pretrained_model/pretrained_parameters.pth
+       prediction.py -p feature_directory examples/chain_list.txt pretrained_model/pretrained_parameters.pth
  
     - prediction-only mode (-p) does not evaluate the model by comparing predictions with the original sequence 
  
