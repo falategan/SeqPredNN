@@ -4,7 +4,7 @@ Deep feed-forward neural network for predicting amino acid sequences from protei
 
 ## Requirements
 
-* Python >= 3.7
+* Python 3.9
 * Pytorch
 * Numpy
 * SciKit-Learn
