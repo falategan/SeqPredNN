@@ -16,6 +16,8 @@ Deep feed-forward neural network for predicting amino acid sequences from protei
 
 ### Predicting protein sequences using the pretrained model:
 
+![Prediction process flowchart](/prediction_diagram.png)
+
 1.  Featurise your protein strucutures using `featurise.py`
 
         featurise.py -v -o feature_directory examples/chain_list.txt examples/pdb_divided divided 
@@ -32,6 +34,8 @@ Deep feed-forward neural network for predicting amino acid sequences from protei
     - prediction-only mode (-p) does not evaluate the model by comparing predictions with the original sequence 
  
 ### Training your own model:
+
+![Train process flowchart](/train_diagram.png)
 
 1. Download the PDB files of the structures in your training dataset - https://www.wwpdb.org/ftp/pdb-ftp-sites
 2. Featurise your protein strucutures using `featurise.py`
