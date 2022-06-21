@@ -18,7 +18,7 @@ Deep feed-forward neural network for predicting amino acid sequences from protei
 
 ![Prediction process flowchart](/prediction_diagram.png)
 
-1.  Featurise your protein strucutures using `featurise.py`
+1.  Featurise your protein structures using `featurise.py`
 
         featurise.py -v -o feature_directory examples/chain_list.txt examples/pdb_divided divided 
 
