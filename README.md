@@ -69,6 +69,6 @@ The pretrained model was trained using the chains in pretrained_model/40_res3_no
 ## Licence
 This software and code is distributed under a GNU General Public License V3
 
-##Poster
+## Poster
 
 ![SeqPredNN Conference Poster](/SeqPredNN_Poster.png)
