@@ -88,6 +88,7 @@ def validate_final(dataloader, model):
             true.extend(labels)
     return true, pred
 
+
 class Sampling:
     def __init__(self, input_dir, test_list_path, train_ratio):
         self.train_ratio = train_ratio
@@ -213,6 +214,7 @@ class Sampling:
         # get features for sampled residues
         train_feature_dict, validation_features_dict = self.get_features(train_idx, validation_idx)
         return train_feature_dict, validation_features_dict
+
 
 if __name__ == "__main__":
     input_dir, sampling_mode, train_ratio, test_set, out_dir, epochs, = get_args()

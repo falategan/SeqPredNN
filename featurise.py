@@ -44,7 +44,7 @@ def read_chain_file(path):
 
 
 def write_exclusion(protein_id, chains):
-    with open(out_dir / 'excluded.txt', 'a') as file:
+    with open(out_dir / 'excluded_chains.txt', 'a') as file:
         if verbose:
             print('Excluding', protein_id, chains, 'from dataset.')
         if len(chains) > 1:
