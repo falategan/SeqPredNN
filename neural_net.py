@@ -6,7 +6,7 @@ from torch.utils.data import Dataset
 class StructureDataset(Dataset):
     def __init__(self, features):
         self.labels = features['residue_labels'].long()
-        self.example_features = [torch.flatten(features[key], start_dim=1) for key in ['displacements', 'rotations',
+        self.example_features = [torch.flatten(features[key], start_dim=1) for key in ['translations', 'rotations',
                                                                                        'torsional_angles']]
         self.examples = torch.cat(self.example_features, dim=1)
 

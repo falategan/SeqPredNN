@@ -154,7 +154,7 @@ class Sampling:
         validation_feature_dict = {}
 
         print('Fetching features for sampled indices...\n')
-        feature_strings = ['displacements', 'residue_labels', 'rotations', 'torsional_angles']
+        feature_strings = ['translations', 'residue_labels', 'rotations', 'torsional_angles']
         for feature in feature_strings:
             train_features, validation_features = [], []
             for chain in self.chains:

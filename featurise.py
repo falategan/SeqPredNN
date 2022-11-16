@@ -8,7 +8,7 @@ from collections import defaultdict
 import warnings
 import torch
 # import matplotlib.pyplot as plt
-
+import time
 
 aa_dict = {'GLY': 0., 'ALA': 1., 'CYS': 2., 'PRO': 3., 'VAL': 4., 'ILE': 5., 'LEU': 6., 'MET': 7.,
            'PHE': 8., 'TRP': 9., 'SER': 10., 'THR': 11., 'ASN': 12., 'GLN': 13., 'TYR': 14.,
@@ -85,7 +85,6 @@ def featurise_protein(protein_id, selected_chains):
                         write_exclusion(protein_id, protein.excluded_chains)
                     parsed_chains += len(protein.selected_chains) - len(protein.excluded_chains)
                     skipped_chains += len(protein.excluded_chains)
-
                 except Exception as error:
                     # Exception encountered during featurisation -- protein code is written in excluded chain file
                     warning = str(str(type(error)) + ': ' + str(error) + ' in protein ' + protein_id)
@@ -117,13 +116,13 @@ class Protein:
                 neighbours, torsional_angles = chain.get_neighbours(self.chains)
                 residue_labels = np.array([aa_dict[res.get_resname()] for res in neighbours[:, 0]])
                 # derive local coordinate system for each residue
-                CA_vectors, backbone_basis, sidechain_basis, third_basis = get_basis_vectors(neighbours)
+                ca_vectors, u, v, w = get_basis_vectors(neighbours)
                 # calculate relative positions of neighbours in the local coordinate system of each residue
-                displacements = get_displacements(CA_vectors, backbone_basis, sidechain_basis, third_basis)
+                translations = get_translations(ca_vectors, u, v, w)
                 # calculate quaternion rotations to the local coordinate systems of neighbouring residues
-                rotations = get_rotations(backbone_basis, sidechain_basis, third_basis)
+                rotations = get_rotations(u, v, w)
                 # save features to numpy array files
-                torch.save(displacements, out_dir / ('displacements_' + self.name + chain.id + '.pt'))
+                torch.save(translations, out_dir / ('translations_' + self.name + chain.id + '.pt'))
                 torch.save(residue_labels, out_dir / ('residue_labels_' + self.name + chain.id + '.pt'))
                 torch.save(rotations, out_dir / ('rotations_' + self.name + chain.id + '.pt'))
                 torch.save(torsional_angles, out_dir / ('torsional_angles_' + self.name + chain.id + '.pt'))
@@ -134,51 +133,49 @@ class Protein:
                 with open(out_dir / 'chain_list.csv', 'a') as file:
                     file.write(self.name + chain.id + ',' + str(len(residue_labels)) + '\n')
             except Exception as error:
-                warning = str(str(type(error)) + ': ' + str(error) + ' in chain ' + self.name+chain.id)
+                warning = str(str(type(error)) + ': ' + str(error) + ' in chain ' + self.name + chain.id)
                 warnings.warn(warning, UserWarning)
                 self.excluded_chains.append(chain.id)
 
 
-def pseudo_beta(residue, CA_vector):
-    N_vector = residue['N'].get_vector()
-    C_vector = residue['C'].get_vector()
+def normalise_vectors(vector_array):
+    return vector_array / np.linalg.norm(vector_array, axis=-1, keepdims=True)
 
-    N_CA = CA_vector - N_vector
-    CA_C = C_vector - CA_vector
-    N_C = C_vector - N_vector
 
-    rotation_matrix_1 = vectors.rotaxis(131.5 * np.pi / 180, CA_C)
-    rotation_matrix_2 = vectors.rotaxis(-7 * np.pi / 180, N_C)
-    pseudo = (-N_CA).left_multiply(rotation_matrix_1)
-    pseudo = pseudo.left_multiply(rotation_matrix_2)
+def dot_product(array_a, array_b, keepdims=True):
+    return np.sum(array_a * array_b, axis=-1, keepdims=keepdims)
 
-    return pseudo
+
+def project_vectors(array_a, array_b, keepdims=True):
+    a_dot_b = dot_product(array_a, array_b, keepdims=keepdims)
+    b_dot_b = dot_product(array_b, array_b, keepdims=keepdims)
+    return (a_dot_b / b_dot_b) * array_b
 
 
 def get_basis_vectors(neighbours):
-    CA_vectors = np.vectorize(lambda residue: residue['CA'].get_vector())(neighbours)
-    N_vectors = np.vectorize(lambda residue: residue['N'].get_vector())(neighbours)
-    C_vectors = np.vectorize(lambda residue: residue['C'].get_vector())(neighbours)
+    ca_coords = np.array([[neighbour['CA'].get_coord() for neighbour in position]
+                          for position in neighbours], dtype=float)
+    n_coords = np.array([[neighbour['N'].get_coord() for neighbour in position]
+                         for position in neighbours], dtype=float)
+    c_coords = np.array([[neighbour['C'].get_coord() for neighbour in position]
+                         for position in neighbours], dtype=float)
 
-    backbone_vectors = np.vectorize(lambda vector: vector.normalized())(C_vectors - N_vectors)
-    sidechain_vectors = np.vectorize(lambda residue, CA: residue['CB'].get_vector() - CA if 'CB' in residue
-                                     else pseudo_beta(residue, CA))(neighbours, CA_vectors)
+    u = normalise_vectors(c_coords - n_coords)
+    n_to_ca = normalise_vectors(ca_coords - n_coords)
+    v = normalise_vectors(n_to_ca - project_vectors(n_to_ca, u))
+    w = np.cross(u, v)
 
-    # third basis is the cross product of the backbone vector and the sidechain vector
-    third_bases = np.vectorize(lambda vec1, vec2: pow(vec1, vec2).normalized())(backbone_vectors, sidechain_vectors)
-    # orthogonalise third basis and sidechain vector
-    sidechain_vectors = np.vectorize(lambda vec1, vec2: pow(vec1, vec2).normalized())(backbone_vectors, third_bases)
-
-    return CA_vectors, backbone_vectors, sidechain_vectors, third_bases
+    return ca_coords, u, v, w
 
 
-def get_displacements(CA_vectors, x_basis, y_basis, z_basis):
-    global_displacement = CA_vectors[:, 1:] - CA_vectors[:, :1]
+def get_translations(ca_vectors, u, v, w):
+    xyz_translation = ca_vectors[:, 1:] - ca_vectors[:, :1]
+
     # get x component of global displacement by dot product with the unit X vector
-    x_displacement = np.vectorize(lambda disp, basis: disp * basis)(global_displacement, x_basis[:, :1])
-    y_displacement = np.vectorize(lambda disp, basis: disp * basis)(global_displacement, y_basis[:, :1])
-    z_displacement = np.vectorize(lambda disp, basis: disp * basis)(global_displacement, z_basis[:, :1])
-    displacements = np.stack([x_displacement, y_displacement, z_displacement], axis=-1)
+    u_translation = project_vectors(xyz_translation, u[:, :1])
+    v_translation = project_vectors(xyz_translation, v[:, :1])
+    w_translation = project_vectors(xyz_translation, w[:, :1])
+    uvw_translations = np.stack([u_translation, v_translation, w_translation], axis=-1)
 
     '''
     # VISUALISE DISTANCES AS NORM OF DISPLACEMENT
@@ -191,24 +188,18 @@ def get_displacements(CA_vectors, x_basis, y_basis, z_basis):
     '''
 
     # pad displacements
-    if displacements.shape[1] < N_NEIGHBOURS:
-        displacements = np.pad(displacements, pad_width=((0, 0), (0, N_NEIGHBOURS - displacements.shape[1]), (0, 0)),
-                               mode='constant', constant_values=0.)
-    return displacements
+    if uvw_translations.shape[1] < N_NEIGHBOURS:
+        uvw_translations = np.pad(uvw_translations,
+                                  pad_width=((0, 0), (0, N_NEIGHBOURS - uvw_translations.shape[1]), (0, 0)),
+                                  mode='constant', constant_values=0.)
+    return uvw_translations
 
 
-def get_rotations(x_basis, y_basis, z_basis):
-    x_basis_1 = np.array([vec.get_array() for vec in x_basis[:, 0]])
-    y_basis_1 = np.array([vec.get_array() for vec in y_basis[:, 0]])
-    z_basis_1 = np.array([vec.get_array() for vec in z_basis[:, 0]])
-    basis_1 = np.stack([x_basis_1, y_basis_1, z_basis_1], axis=1)
-    basis_1 = np.expand_dims(basis_1, axis=1)
-    neighbours_x_bases = np.array([[vec.get_array() for vec in cur_res] for cur_res in x_basis[:, 1:]])
-    neighbours_y_bases = np.array([[vec.get_array() for vec in cur_res] for cur_res in y_basis[:, 1:]])
-    neighbours_z_bases = np.array([[vec.get_array() for vec in cur_res] for cur_res in z_basis[:, 1:]])
-    neighbour_bases = np.stack([neighbours_x_bases, neighbours_y_bases, neighbours_z_bases], axis=2)
-    basis_1_transpose = np.transpose(basis_1, (0, 1, 3, 2))
-    rotation_matrices = neighbour_bases @ basis_1_transpose
+def get_rotations(u, v, w):
+    local_basis = np.stack([u[:, :1], v[:, :1], w[:, :1]], axis=2)
+    neighbour_bases = np.stack([u[:, 1:], v[:, 1:], w[:, 1:]], axis=2)
+    neighbour_bases_transpose = neighbour_bases.transpose((0, 1, 3, 2))
+    rotation_matrices = neighbour_bases_transpose @ local_basis
     rotation_matrices = [Rotation.from_matrix(neighbour_matrices) for neighbour_matrices in rotation_matrices]
     quaternions = np.array([matrix.as_quat() for matrix in rotation_matrices])
     # pad quaternions
@@ -249,12 +240,6 @@ class Chain:
                 self.ignored_residues[i] = res.get_resname()
                 if verbose:
                     print('\t\tCA missing in', res.get_resname(), 'at position', i)
-            try:
-                self.CB = res['CB']
-            except KeyError:
-                if res.get_resname() != 'GLY':
-                    if verbose:
-                        print('\t\tCB missing in', res.get_resname(), 'at position', i)
             if not is_aa(res, standard=True):
                 self.ignored_residues[i] = res.get_resname()
                 if verbose:
