@@ -442,7 +442,6 @@ def featurise(chain_file: str,
         include_modified: Convert modified amino acids to their respective unmodified versions. Modified residues are
         converted to the unknown residue X, and excluded from the training set if include_modified == False
     """
-    np.warnings.filterwarnings('error', category=np.VisibleDeprecationWarning)
 
     # get command-line arguments
     chain_file = pathlib.Path(chain_file)
