@@ -1,0 +1,17 @@
+name: SeqPredNN
+channels:
+  - pytorch
+  - conda-forge
+  - nvidia
+  - defaults
+dependencies:
+  - pillow=9.0.1
+  - scikit-learn
+  - scipy
+  - python=3.9
+  - numpy
+  - biopython
+  - matplotlib
+  - pytorch-cuda=11.8
+  - pytorch
+prefix: /home/stibbons/anaconda3/envs/SeqPredNN
