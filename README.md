@@ -51,16 +51,26 @@ We recommend using ![conda](https://docs.conda.io/projects/conda/en/stable/user-
 
 2.  Generate structural features for your protein structures using ![featurise.py](/SeqPredNN)
 
-        python featurise.py -gm -o example_features examples/chain_list.csv examples/example_pdb_directory
+        python SeqPredNN/featurise.py -gm -o example_features examples/chain_list.csv examples/example_pdb_directory
  
     - The `-gm` argument indicates that the structure files are gzipped and should be uncompressed before they are parsed (`-g`), and that modified amino acids should be converted to the appropriate unmodified standard amino acid (`-m`)
-    - For additional command line arguments run `featurise.py --help`
+    - The `-o` argument indicates the directory where the structural features will be saved (in this case the features will be saved in `example_features/`)
+    - There are two positional arguments:
+      1. the chain list
+      2. the PDB directory
+    - For additional command line arguments run 
+    
+            python SeqPredNN/featurise.py --help
 
-2. Predict amino acid sequences using `prediction.py`
+2. Predict amino acid sequences using ![predict.py](/SeqPredNN)
 
-       prediction.py -p example_features example_features/chain_list.txt pretrained_model/pretrained_parameters.pth
+       python SeqPredNN/predict.py -p example_features example_features/chain_list.txt pretrained_model/pretrained_parameters.pth
  
-    - prediction-only mode (-p) does not evaluate the model by comparing predictions with the original sequence 
+    - prediction-only mode `-p` only predicts sequences and does not evaluate the model by comparing predicted sequences with the original sequence
+    - There are three positional arguments:
+      1. the directory where the features are saved (here example_features)
+      2. a newline-seperated text file listing all the protein chains to be predicted (chain_list.txt lists all the featurised chains. It is automatically generated in the feature directory)
+      3. the neural network parameters (here ![pretrained_model/pretrained_parameters.pth](/pretrained_model))
  
 ### Training your own model:
 
