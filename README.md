@@ -2,12 +2,14 @@
 
 Deep feed-forward neural network for predicting amino acid sequences from protein conformations.
 
+
 ## Table of Contents
 
 1. ![Requirements](##Requirements)
 2. ![Usage](##Usage)
       1. ![Installing dependencies](###Installing-dependencies)
       2. ![Predicting protein sequences](###Predicting-protein-sequences)
+
 
 
 ## Requirements
@@ -20,7 +22,9 @@ Deep feed-forward neural network for predicting amino acid sequences from protei
 * Scipy
 * Biopython
 
+
 ## Usage
+
 
 ### Installing dependencies
 
@@ -30,6 +34,7 @@ We recommend using ![conda](https://docs.conda.io/projects/conda/en/stable/user-
         conda env create -n SeqPredNN -f SeqPRedNN_environment.yml
 2. Activate the conda environment before using SeqPredNN
         conda activate SeqPredNN
+
 
 ### Predicting protein sequences
 
@@ -45,12 +50,13 @@ We recommend using ![conda](https://docs.conda.io/projects/conda/en/stable/user-
       
            3. The neural network parameters of the trained sequence prediction model
       
-      - Examples of a ![chain list](/examples/chain_list.csv) and ![PDB directory](/examples/example_pdb_directory) are given in ![/examples/](/example)
+      - Examples of a chain list and PDB directory are given in ![/examples/](/example)
       
-      - We vaildated SeqPredNN using the ![pretrained SeqPredNN model parameters] and recommend you use these parameters to generate protein sequences
+      - We vaildated SeqPredNN using the ![pretrained SeqPredNN model parameters](
+##Pretrained-model) and recommend you use these parameters to generate protein sequences.
 
-2.  Generate structural features for your protein structures using ![featurise.py](/SeqPredNN)
-
+2.  Generate structural features for your protein structures using `featurise.py`
+        
         python SeqPredNN/featurise.py -gm -o example_features examples/chain_list.csv examples/example_pdb_directory
  
     - The `-gm` argument indicates that the structure files are gzipped and should be uncompressed before they are parsed (`-g`), and that modified amino acids should be converted to the appropriate unmodified standard amino acid (`-m`)
@@ -62,7 +68,7 @@ We recommend using ![conda](https://docs.conda.io/projects/conda/en/stable/user-
     
             python SeqPredNN/featurise.py --help
 
-2. Predict amino acid sequences using ![predict.py](/SeqPredNN)
+2. Predict amino acid sequences using `predict.py`
 
        python SeqPredNN/predict.py -p example_features example_features/chain_list.txt pretrained_model/pretrained_parameters.pth
  
@@ -70,18 +76,21 @@ We recommend using ![conda](https://docs.conda.io/projects/conda/en/stable/user-
     - There are three positional arguments:
       1. the directory where the features are saved (here example_features)
       2. a newline-seperated text file listing all the protein chains to be predicted (chain_list.txt lists all the featurised chains. It is automatically generated in the feature directory)
-      3. the neural network parameters (here ![pretrained_model/pretrained_parameters.pth](/pretrained_model))
+      3. the neural network parameters (here pretrained_model/pretrained_parameters.pth)
+ 
  
 ### Training your own model:
 
 ![Train process flowchart](/train_diagram.png)
 
 1. Download the PDB files of the structures in your training dataset - https://www.wwpdb.org/ftp/pdb-ftp-sites
+
 2. Generate structural features for the proteins using ![featurise.py](/SeqPredNN)
     - see ![**Predicting protein sequences**](###Predicting-protein-sequences) for more details
-3. Train the model using `train_model.py`
+ 
+3. Train the model using ![train_model.py](/SeqPredNN)
 
-       train_model.py -r 0.9 -t test_chains.txt -o my_model -e 200 feature_directory balanced
+       python SeqPredNN/train_model.py feature_directory 
 
     - The train ratio (-r) is the fraction of residues assigned to the training dataset. The remaining residues are assigned to a validation set used to evaluate the model during training
     - The test chain file (-t) specifies which chains should be excluded from the training and validation datasets so that they can be used for independent evaluation of the model. The test chain file must be in the same format as examples/chain_list.txt.
