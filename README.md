@@ -2,6 +2,14 @@
 
 Deep feed-forward neural network for predicting amino acid sequences from protein conformations.
 
+## Table of Contents
+
+1. ![Requirements](##Requirements)
+2. ![Usage](##Usage)
+      1. ![Installing dependencies](###Installing-dependencies)
+      2. ![Installing dependencies](###Predicting-protein-sequences)
+
+
 ## Requirements
 
 * Python 3.9
@@ -23,20 +31,26 @@ We recommend using ![conda](https://docs.conda.io/projects/conda/en/stable/user-
 2. Activate the conda environment before using SeqPredNN
         conda activate SeqPredNN
 
-### Predicting protein sequences using the pretrained model:
+### Predicting protein sequences:
 
 ![Prediction process flowchart](/prediction_diagram.png)
 
-1.  Generate structural features for your protein structures using ![featurise.py](/SeqPredNN)
+1.  Prepare input files
+        - ![featurise.py](/SeqPredNN) requires:
+        1. a directory containing the .pdb format files of your protein structures
+        2. a comma-separated list of protein names, pdb filepaths in the abovementioned directory, and protein chain IDs for each protein chain e.g. the row for chain B of protein 1HST in the file /examples/example_pdb_directory/1hst.pdb.gz would read "1HST, 1hst.pdb.gz, B"
+        - examples of a ![chain list](/examples/chain_list.csv) and ![PDB directory](/examples/example_pdb_directory) are given in ![/examples/](/example)
+
+2.  Generate structural features for your protein structures using ![featurise.py](/SeqPredNN)
 
         featurise.py -gm -o example_features examples/chain_list.csv examples/example_pdb_directory
 
-    - examples of a ![chain list](/examples/chain_list.csv) and ![PDB directory](/examples/example_pdb_directory) are given in ![/examples/](/example)
-    - examples/chain_list.csv is text file specifying the protein chains that must be featurised. It contains a comma-separated list of protein chain IDs and paths from the PDB directory to the relevant pdb crystal structure files e.g. the row for chain B of protein 1HST in the file /examples/example_pdb_directory/1hst.pdb.gz would read "1HST, 1hst.pdb.gz, B"
+    
+    - examples/chain_list.csv is text file specifying the protein chains that must be featurised. It contains 
     - The `-gm` argument indicates that the structure files are gzipped and should be uncompressed before they are parsed (`-g`), and that modified amino acids should be converted to the appropriate unmodified standard amino acid (`-m`)
     - For additional command line arguments run `featurise.py --help`
 
-2. Predict sequence using `prediction.py`
+2. Predict amino acid sequences using `prediction.py`
 
        prediction.py -p feature_directory examples/chain_list.txt pretrained_model/pretrained_parameters.pth
  
