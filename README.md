@@ -7,7 +7,7 @@ Deep feed-forward neural network for predicting amino acid sequences from protei
 1. ![Requirements](##Requirements)
 2. ![Usage](##Usage)
       1. ![Installing dependencies](###Installing-dependencies)
-      2. ![Installing dependencies](###Predicting-protein-sequences)
+      2. ![Predicting protein sequences](###Predicting-protein-sequences)
 
 
 ## Requirements
@@ -31,28 +31,34 @@ We recommend using ![conda](https://docs.conda.io/projects/conda/en/stable/user-
 2. Activate the conda environment before using SeqPredNN
         conda activate SeqPredNN
 
-### Predicting protein sequences:
+### Predicting protein sequences
 
 ![Prediction process flowchart](/prediction_diagram.png)
 
 1.  Prepare input files
-        - ![featurise.py](/SeqPredNN) requires:
-        1. a directory containing the .pdb format files of your protein structures
-        2. a comma-separated list of protein names, pdb filepaths in the abovementioned directory, and protein chain IDs for each protein chain e.g. the row for chain B of protein 1HST in the file /examples/example_pdb_directory/1hst.pdb.gz would read "1HST, 1hst.pdb.gz, B"
-        - examples of a ![chain list](/examples/chain_list.csv) and ![PDB directory](/examples/example_pdb_directory) are given in ![/examples/](/example)
+
+      Predicting an amino acid sequence for a set of protein structures requires:
+        
+      1. a directory containing the .pdb format files of your protein structures
+        
+      2. a comma-separated list of protein names, pdb filepaths in the abovementioned directory, and protein chain IDs for each protein chain e.g. the row for chain B of protein 1HST in the file /examples/example_pdb_directory/1hst.pdb.gz would read "1HST, 1hst.pdb.gz, B"
+      
+      3. The neural network parameters of the trained sequence prediction model
+      
+      Examples of a ![chain list](/examples/chain_list.csv) and ![PDB directory](/examples/example_pdb_directory) are given in ![/examples/](/example)
+      
+      We vaildated SeqPredNN using the ![pretrained SeqPredNN model parameters] and recommend you use these parameters to generate protein sequences
 
 2.  Generate structural features for your protein structures using ![featurise.py](/SeqPredNN)
 
-        featurise.py -gm -o example_features examples/chain_list.csv examples/example_pdb_directory
-
-    
-    - examples/chain_list.csv is text file specifying the protein chains that must be featurised. It contains 
+        python featurise.py -gm -o example_features examples/chain_list.csv examples/example_pdb_directory
+ 
     - The `-gm` argument indicates that the structure files are gzipped and should be uncompressed before they are parsed (`-g`), and that modified amino acids should be converted to the appropriate unmodified standard amino acid (`-m`)
     - For additional command line arguments run `featurise.py --help`
 
 2. Predict amino acid sequences using `prediction.py`
 
-       prediction.py -p feature_directory examples/chain_list.txt pretrained_model/pretrained_parameters.pth
+       prediction.py -p example_features example_features/chain_list.txt pretrained_model/pretrained_parameters.pth
  
     - prediction-only mode (-p) does not evaluate the model by comparing predictions with the original sequence 
  
