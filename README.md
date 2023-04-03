@@ -37,17 +37,17 @@ We recommend using ![conda](https://docs.conda.io/projects/conda/en/stable/user-
 
 1.  Prepare input files
 
-      Predicting an amino acid sequence for a set of protein structures requires:
+      - Predicting an amino acid sequence for a set of protein structures requires:
         
-      1. a directory containing the .pdb format files of your protein structures
+           1. a directory containing the .pdb format files of your protein structures
         
-      2. a comma-separated list of protein names, pdb filepaths in the abovementioned directory, and protein chain IDs for each protein chain e.g. the row for chain B of protein 1HST in the file /examples/example_pdb_directory/1hst.pdb.gz would read "1HST, 1hst.pdb.gz, B"
+           2. a comma-separated list of protein names, pdb filepaths in the abovementioned directory, and protein chain IDs for each protein chain e.g. the row for chain B of protein 1HST in the file /examples/example_pdb_directory/1hst.pdb.gz would read "1HST, 1hst.pdb.gz, B"
       
-      3. The neural network parameters of the trained sequence prediction model
+           3. The neural network parameters of the trained sequence prediction model
       
-      Examples of a ![chain list](/examples/chain_list.csv) and ![PDB directory](/examples/example_pdb_directory) are given in ![/examples/](/example)
+      - Examples of a ![chain list](/examples/chain_list.csv) and ![PDB directory](/examples/example_pdb_directory) are given in ![/examples/](/example)
       
-      We vaildated SeqPredNN using the ![pretrained SeqPredNN model parameters] and recommend you use these parameters to generate protein sequences
+      - We vaildated SeqPredNN using the ![pretrained SeqPredNN model parameters] and recommend you use these parameters to generate protein sequences
 
 2.  Generate structural features for your protein structures using ![featurise.py](/SeqPredNN)
 
@@ -77,8 +77,8 @@ We recommend using ![conda](https://docs.conda.io/projects/conda/en/stable/user-
 ![Train process flowchart](/train_diagram.png)
 
 1. Download the PDB files of the structures in your training dataset - https://www.wwpdb.org/ftp/pdb-ftp-sites
-2. Featurise your protein strucutures using `featurise.py`
-    - see **Predicting protein sequences using the pretrained model** for more details
+2. Generate structural features for the proteins using ![featurise.py](/SeqPredNN)
+    - see ![**Predicting protein sequences**](###Predicting-protein-sequences) for more details
 3. Train the model using `train_model.py`
 
        train_model.py -r 0.9 -t test_chains.txt -o my_model -e 200 feature_directory balanced
