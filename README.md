@@ -27,14 +27,14 @@ We recommend using ![conda](https://docs.conda.io/projects/conda/en/stable/user-
 
 ![Prediction process flowchart](/prediction_diagram.png)
 
-1.  Generate structural features for your protein structures using `featurise.py`
+1.  Generate structural features for your protein structures using ![featurise.py](/SeqPredNN)
 
-        featurise.py -gmv -o example_features examples/chain_list.csv examples/example_pdb_directory
+        featurise.py -gm -o example_features examples/chain_list.csv examples/example_pdb_directory
 
-    - examples of a chain list and PDB directory are given in examples/
-    - examples/chain_list.csv is text file specifying the protein chains that must be featurised. It contains a comma-separated list of protein chain IDs in the format 1XYZA for chain A of protein 1XYZ
-    - examples/pdb_divided is a folder containing protein structures in PDB format. The PDB files must be gzipped and named according to the wwpdb archive convention e.g. pdb1xyz.ent.gz
-    - The divided/all keyword specifies the structure of the PDB directory, according to the convention used by the wwpdb archive. In a "divided" directory the PDB files are stored in subdirectories named according to the middle 2 characters of the PDB code e.g. protein 1XYZ would be found in pdb_dir/xy/. In an "all" directory all the PDB files are in a single directory.
+    - examples of a ![chain list](/examples/chain_list.csv) and ![PDB directory](/examples/example_pdb_directory) are given in ![/examples/](/example)
+    - examples/chain_list.csv is text file specifying the protein chains that must be featurised. It contains a comma-separated list of protein chain IDs and paths from the PDB directory to the relevant pdb crystal structure files e.g. the row for chain B of protein 1HST in the file /examples/example_pdb_directory/1hst.pdb.gz would read "1HST, 1hst.pdb.gz, B"
+    - The `-gm` argument indicates that the structure files are gzipped and should be uncompressed before they are parsed (`-g`), and that modified amino acids should be converted to the appropriate unmodified standard amino acid (`-m`)
+    - For additional command line arguments run `featurise.py --help`
 
 2. Predict sequence using `prediction.py`
 
