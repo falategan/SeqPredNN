@@ -33,11 +33,11 @@ Deep feed-forward neural network for predicting amino acid sequences from protei
 
 We recommend using ![conda](https://docs.conda.io/projects/conda/en/stable/user-guide/install/index.html) to install the required python packages in a contained environment:
 
-1. Import the SeqPredNN environment using the SeqPredNN_environment.yml file
+1. **Import the SeqPredNN environment using the SeqPredNN_environment.yml file**
 
         conda env create -n SeqPredNN -f SeqPRedNN_environment.yml
         
-2. Activate the conda environment before using SeqPredNN
+2. **Activate the conda environment before using SeqPredNN**
 
         conda activate SeqPredNN
 
@@ -46,7 +46,7 @@ We recommend using ![conda](https://docs.conda.io/projects/conda/en/stable/user-
 
 ![Prediction process flowchart](/prediction_diagram.png)
 
-1.  Prepare input files
+1.  **Prepare input files**
 
       - Predicting an amino acid sequence for a set of protein structures requires:
         
@@ -61,7 +61,7 @@ We recommend using ![conda](https://docs.conda.io/projects/conda/en/stable/user-
       - We vaildated SeqPredNN using the ![pretrained SeqPredNN model parameters](
 ##Pretrained-model) and recommend you use these parameters to generate protein sequences.
 
-2.  Generate structural features for your protein structures using `featurise.py`
+2.  **Generate structural features for your protein structures using `featurise.py`**
         
         python SeqPredNN/featurise.py -gm -o example_features examples/chain_list.csv examples/example_pdb_directory
  
@@ -74,7 +74,7 @@ We recommend using ![conda](https://docs.conda.io/projects/conda/en/stable/user-
     
             python SeqPredNN/featurise.py --help
 
-2. Predict amino acid sequences using `predict.py`
+2. **Predict amino acid sequences using `predict.py`**
 
        python SeqPredNN/predict.py -p example_features example_features/chain_list.txt pretrained_model/pretrained_parameters.pth
  
@@ -89,17 +89,17 @@ We recommend using ![conda](https://docs.conda.io/projects/conda/en/stable/user-
 
 ![Train process flowchart](/train_diagram.png)
 
-1. Download the PDB files of the structures in your training dataset - https://www.wwpdb.org/ftp/pdb-ftp-sites
+1. **Download the PDB files of the structures in your training dataset - https://www.wwpdb.org/ftp/pdb-ftp-sites**
 
 
-2. Generate structural features for the proteins using ![featurise.py](/SeqPredNN) e.g 
+2. **Generate structural features for the proteins using ![featurise.py](/SeqPredNN) e.g** 
 
        python SeqPredNN/featurise.py -gm my_pdb_subset.csv my_pdb_directory
       
     - see ![**Predicting protein sequences**](###Predicting-protein-sequences) for more details
     
  
-3. Train the model using ![train_model.py](/SeqPredNN)
+3. **Train the model using ![train_model.py](/SeqPredNN)**
 
        python SeqPredNN/train_model.py -r 0.8 -t my_test_set -e 200 my_feature_directory unbalanced
 
@@ -109,7 +109,7 @@ We recommend using ![conda](https://docs.conda.io/projects/conda/en/stable/user-
     - The balanced/unbalanced keyword specifies the sampling mode. "unbalanced" sampling partitions all the residues in the features into the training and validation datasets. "balanced" sampling undersamples the residues so that each of the 20 amino acid classes occur the same number of times in the dataset.
 
 
-4. Test your model using `predict.py`
+4. **Test your model using `predict.py`**
                 
        python SeqPredNN/predict.py my_feature_directory my_test_set pretrained_model/pretrained_parameters.pth
        
