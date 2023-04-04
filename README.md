@@ -63,7 +63,7 @@ We recommend using ![conda](https://docs.conda.io/projects/conda/en/stable/user-
 
 2.  **Generate structural features for your protein structures using `featurise.py`**
         
-        python SeqPredNN/featurise.py -gm -o example_features examples/chain_list.csv examples/example_pdb_directory
+        python SeqPredNN/featurise.py -gm -o example_features examples/example_chain_list.csv examples/example_pdb_directory
  
     - The `-gm` argument indicates that the structure files are gzipped and should be uncompressed before they are parsed (`-g`), and that modified amino acids should be converted to the appropriate unmodified standard amino acid (`-m`)
     - The `-o` argument indicates the directory where the structural features will be saved (in this case the features will be saved in `example_features/`)
