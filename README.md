@@ -44,7 +44,7 @@ We recommend using ![conda](https://docs.conda.io/projects/conda/en/stable/user-
 
 ### Predicting protein sequences
 
-![Prediction process flowchart](/prediction_diagram.png)
+![Prediction process flowchart](/images/prediction_diagram.png)
 
 1.  **Prepare input files**
 
