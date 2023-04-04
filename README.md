@@ -52,7 +52,7 @@ We recommend using ![conda](https://docs.conda.io/projects/conda/en/stable/user-
         
            1. a directory containing the .pdb format files of your protein structures
         
-           2. a comma-separated list of protein names, pdb filepaths in the abovementioned directory, and protein chain IDs for each protein chain e.g. the row for chain B of protein 1HST in the file /examples/example_pdb_directory/1hst.pdb.gz would read "1HST, 1hst.pdb.gz, B"
+           2. a comma-separated list of protein names, pdb filepaths in the abovementioned directory, and protein chain IDs for each protein chain e.g. the row for chain B of protein 1HST in the file /examples/example_pdb_directory/1hst.pdb.gz would read "1HST,1hst.pdb.gz,B"
       
            3. The neural network parameters of the trained sequence prediction model
       
@@ -115,15 +115,15 @@ We recommend using ![conda](https://docs.conda.io/projects/conda/en/stable/user-
        
    - Predicts the sequences of all the protein chains in the test set, and compares the predictred sequences with the native sequences to evaluate the model performance 
           
-   * Evaluation output:
-     * A classification report with precision, recall and f1-score for each amino acid class
-     * The top K accuracy of the predictions for each amino acid class
-     * 3 confusion matrices (unnormalised, normalised by prediciton and normalised by true residue)
-     * For each chain in the test set:
-       * The predicted sequence
-       * The probabilities for each amino acid class produced by the model for each preducted residue
-       * A classification report
-       * Cross-entropy loss for each predicted residue
+   - Evaluation output:
+     - A classification report with precision, recall and f1-score for each amino acid class
+     - The top K accuracy of the predictions for each amino acid class
+     - 3 confusion matrices (unnormalised, normalised by prediciton and normalised by true residue)
+     - For each chain in the test set:
+       - The predicted sequence
+       - The probabilities for each amino acid class produced by the model for each preducted residue
+       - A classification report
+       - Cross-entropy loss for each predicted residue
 
 ## Pretrained model 
 
