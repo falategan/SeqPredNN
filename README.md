@@ -87,7 +87,7 @@ We recommend using ![conda](https://docs.conda.io/projects/conda/en/stable/user-
  
 ### Training your own model:
 
-![Train process flowchart](/train_diagram.png)
+![Train process flowchart](/images/training_diagram.png)
 
 1. **Download the PDB files of the structures in your training dataset - https://www.wwpdb.org/ftp/pdb-ftp-sites**
 
