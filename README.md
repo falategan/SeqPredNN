@@ -5,13 +5,13 @@ Deep feed-forward neural network for predicting amino acid sequences from protei
 
 ## Table of Contents
 
-1. ![Requirements](##Requirements)
-2. ![Usage](##Usage)
-      1. ![Installing dependencies](###Installing-dependencies)
-      2. ![Predicting protein sequences](###Predicting-protein-sequences)
-      3. ![Training your own model](###Training-your-own-model)
-3. ![Pretrained model](##Pretrained-model)
-4. ![Licence](##Licence)
+1. [Requirements](https://github.com/falategan/SeqPredNN/blob/main/README.md#requirements)
+2. [Usage](https://github.com/falategan/SeqPredNN/blob/main/README.md#Usage)
+      1. [Installing dependencies](https://github.com/falategan/SeqPredNN/blob/main/README.md#Installing-dependencies)
+      2. [Predicting protein sequences](https://github.com/falategan/SeqPredNN/blob/main/README.md#Predicting-protein-sequences)
+      3. [Training your own model](https://github.com/falategan/SeqPredNN/blob/main/README.md#Training-your-own-model)
+3. [Pretrained model](https://github.com/falategan/SeqPredNN/blob/main/README.md#Pretrained-model)
+4. [Licence](https://github.com/falategan/SeqPredNN/blob/main/README.md#Licence)
 
 
 
