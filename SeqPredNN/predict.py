@@ -3,6 +3,7 @@ import logging
 import pathlib
 import warnings
 from typing import TextIO
+import csv
 
 import numpy as np
 import sklearn.metrics as metrics
@@ -177,22 +178,46 @@ def check_labels(true_residues):
     return unused_residues, labels
 
 
-def write_report(file: TextIO, chain_report: str, avg_loss: np.ndarray, unused_residues: list[int]) -> None:
+def write_reports(report_dir: pathlib.Path,
+                  chain: str,
+                  report_amino_acids: list[str],
+                  chain_report: dict[str: float],
+                  avg_loss: np.ndarray,
+                  unused_residues: list[int]) -> None:
     """
     Write a text file reporting precision, recall and F-score statistics for each amino acid class
 
     Args:
-        file: file handle for the file where the report should be written.
+        report_dir: directory where reports are saved
+        chain: name of the protein chain
+        report_amino_acids: list of amino acids names included in the chain
         chain_report: text reporting classification statistics
         avg_loss: average cross-entropy loss between the true and predicted labels
         unused_residues: amino acid classes that do not occur in the true residues
     """
-    file.writelines(chain_report)
-    file.write(f'\nAverage loss: {avg_loss}')
-    file.write('\nNote: precision and F-scores are set to 0.0 for classes that have no predictions')
-    if unused_residues:
+    
+    with open(report_dir / f'{chain}_report.txt', 'w') as file:
+        file.write(f'\nAverage loss: {avg_loss}')
         file.write(
-            f'\nAmino acids with 0 support: {", ".join([STANDARD_AMINO_ACIDS[idx] for idx in unused_residues])}.')
+            '\nNote: precision and F-scores are set to 0.0 for classes that have no predictions')
+        if unused_residues:
+            file.write(
+                f'\nAmino acids with 0 support: {", ".join([STANDARD_AMINO_ACIDS[idx] for idx in unused_residues])}.')
+
+    with open(report_dir / f'{chain}_report.csv', 'w') as csvfile:
+        metric_list = ['precision', 'recall', 'f1-score', 'support']
+        csv_writer = csv.writer(csvfile,
+                                lineterminator="\n"
+                                )
+        csv_writer.writerow(["amino acid"] + metric_list)
+        for label in STANDARD_AMINO_ACIDS:
+            if label in report_amino_acids:
+                row = [label] + [chain_report[label][metric]
+                                 for metric in metric_list
+                                 ]
+            else:
+                row = [label, "N/A", "N/A", "N/A", 0]
+            csv_writer.writerow(row)
 
 
 class Evaluator:
@@ -235,32 +260,21 @@ class Evaluator:
             # suppress sklearn warnings
             warnings.simplefilter("ignore")
             # generate report of per-class precision, recall and F1-scores
-            chain_report = metrics.classification_report(true_residues, pred_residues,
+            chain_report = metrics.classification_report(true_residues,
+                                                         pred_residues,
                                                          target_names=report_amino_acids,
-                                                         labels=labels, digits=3, zero_division=0)
-            metric_dict = metrics.classification_report(self.model_true,
-                                                        self.model_predictions,
-                                                        target_names=report_amino_acids,
-                                                        digits=5,
-                                                        zero_division=0,
-                                                        labels=labels,
-                                                        output_dict=True)
+                                                         labels=labels,
+                                                         digits=3,
+                                                         zero_division=0,
+                                                         output_dict=True
+                                                         )
+
+
         # write files
         report_dir = self.out_dir / 'chain_reports'
         if not report_dir.exists():
             report_dir.mkdir()
-        with open(report_dir / f'{chain}_report.txt', 'w') as file:
-            write_report(file, chain_report, avg_loss, unused_residues)
-        with open(report_dir / f'{chain}_report.csv', 'w') as file:
-            metric_list = ['precision', 'recall', 'f1-score', 'support']
-            file.write(' ,Precision, Recall, F1-Score, Support\n')
-            for label in STANDARD_AMINO_ACIDS:
-                if label in report_amino_acids:
-                    file.write(
-                        f'{label},{",".join([str(metric_dict[label][metric]) for metric in metric_list])}\n')
-                    continue
-                file.write(
-                    f'{label},N/A,N/A,N/A,0\n')
+        write_reports(report_dir, chain, report_amino_acids, chain_report, avg_loss, unused_residues)
         original_dir = self.out_dir / 'original_sequences'
         if not original_dir.exists():
             original_dir.mkdir()
@@ -269,12 +283,18 @@ class Evaluator:
         probability_dir = self.out_dir / 'probabilities'
         if not probability_dir.exists():
             probability_dir.mkdir()
-        np.savetxt(probability_dir / f'{chain}_probabilities.csv', chain_softmax, delimiter=',',
-                   header=','.join(STANDARD_AMINO_ACIDS), comments='')
+        np.savetxt(probability_dir / f'{chain}_probabilities.csv',
+                   chain_softmax,
+                   delimiter=',',
+                   header=','.join(STANDARD_AMINO_ACIDS),
+                   comments='')
         loss_dir = self.out_dir / 'residue_loss'
         if not loss_dir.exists():
             loss_dir.mkdir()
-        np.savetxt(loss_dir / f'{chain}_residue_losses.csv', loss, delimiter=',')
+        np.savetxt(loss_dir / f'{chain}_residue_losses.csv',
+                   loss,
+                   delimiter=','
+                   )
 
     def model(self):
         """ Generate a classification report, confusion matrices and a top-K accuracy curve for the test set."""
@@ -307,32 +327,20 @@ class Evaluator:
             report_amino_acids = [STANDARD_AMINO_ACIDS[i] for i in labels]
 
             model_report = metrics.classification_report(self.model_true,
-                                                         self.model_predictions,
-                                                         target_names=report_amino_acids,
-                                                         digits=3,
-                                                         zero_division=0,
-                                                         labels=labels)
-            metric_dict = metrics.classification_report(self.model_true,
                                                         self.model_predictions,
                                                         target_names=report_amino_acids,
                                                         digits=5,
                                                         zero_division=0,
                                                         labels=labels,
                                                         output_dict=True)
-
-        with open(self.out_dir / 'report.txt', 'w') as file:
-            write_report(file, model_report, avg_loss, unused_residues)
-
-        with open(self.out_dir / 'report.csv', 'w') as file:
-            metric_list = ['precision', 'recall', 'f1-score', 'support']
-            file.write(' ,Precision, Recall, F1-Score, Support\n')
-            for label in STANDARD_AMINO_ACIDS:
-                if label in report_amino_acids:
-                    file.write(
-                        f'{label},{",".join([str(metric_dict[label][metric]) for metric in metric_list])}\n')
-                    continue
-                file.write(
-                    f'{label},N/A,N/A,N/A,0\n')
+        
+        write_reports(self.out_dir,
+                      "model",
+                      report_amino_acids,
+                      model_report,
+                      avg_loss,
+                      unused_residues
+                      )
 
 
 def prediction():
