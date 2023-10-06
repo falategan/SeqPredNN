@@ -131,3 +131,7 @@ The pretrained model was trained using the chains in [pretrained_model/SeqPredNN
 
 ## Licence
 This software and code is distributed under a [GNU General Public License V3](/Licence)
+
+## Citation
+Lategan, F.A., Schreiber, C. & Patterton, H.G. SeqPredNN: a neural network that generates protein sequences that fold into specified tertiary structures. BMC Bioinformatics 24, 373 (2023). https://doi.org/10.1186/s12859-023-05498-4
+
