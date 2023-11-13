@@ -106,7 +106,7 @@ https://github.com/falategan/SeqPredNN/blob/main/README.md#Pretrained-model) and
     - The train ratio (`-r`) is the fraction of residues assigned to the training dataset. The remaining residues are assigned to a validation set used to evaluate the model during training
     - The test chain file (`-t`)  is a newline-delimited text file listing chains that should be excluded from the training and validation datasets so that they can be used for independent evaluation of the model.
     - the number of epochs for training (`-e`)
-    - The balanced/unbalanced keyword specifies the sampling mode. "unbalanced" sampling partitions all the residues in the features into the training and validation datasets. "balanced" sampling undersamples the residues so that each of the 20 amino acid classes occur the same number of times in the dataset.
+    - The oversample/undersample/unbalanced keyword specifies the sampling mode. "unbalanced" sampling partitions all the residues in the features into the training and validation datasets. "oversample" oversamples the residues so that each of the 20 amino acid classes occur the same number of times as the **most common** amino acid class in the dataset. "undersample" undersamples the residues so that each of the 20 amino acid classes occur the same number of times as the **least common** amino acid class in the dataset.
 
 
 4. **Test your model using `predict.py`**
